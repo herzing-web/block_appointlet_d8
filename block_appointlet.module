@@ -1,0 +1,48 @@
+<?php
+  /**
+   * @file
+   * ${Title}
+   *
+   * User: mwessel
+   * Date: 12/16/2019
+   * Time: 3:44 PM
+   */
+
+  use Drupal\Core\Routing\RouteMatchInterface;
+
+  /**
+   * Implements hook_help().
+   */
+  function block_appointlet_help($route_name, RouteMatchInterface $route_match) {
+    switch ($route_name) {
+      // Main module help for the block_program_grid module.
+      case 'help.page.block_appointlet':
+        $output = '';
+        $output .= '<h3>' . t('About') . '</h3>';
+        $output .= '<p>' . t('Display a button linking to Appointlet as a block or token') . '</p>';
+        return $output;
+
+      default:
+    }
+  }
+
+  /**
+   * Implements hook_theme().
+   */
+  function block_appointlet_theme() {
+
+    return [
+
+//    'block_program_grid' => [
+//      'render element' => 'children',
+//    ],
+
+      'block_appointlet_button' => [
+        'template'  => 'block-appointlet-button',
+        'variables' => [
+          'button_data'  => [],
+        ]
+      ],
+    ];
+
+  }

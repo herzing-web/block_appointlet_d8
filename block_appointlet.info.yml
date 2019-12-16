@@ -1,0 +1,7 @@
+name: 'Appointlet Block'
+type: module
+description: 'Display a button linking to Appointlet as a block or token'
+core: 8.x
+package: 'Herzing'
+#dependencies:
+
