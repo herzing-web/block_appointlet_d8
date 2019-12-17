@@ -1,0 +1,7 @@
+block_appointlet.block_appointlet_admin:
+  path: '/admin/config/block_appointlet'
+  defaults:
+    _form: 'Drupal\block_appointlet\Form\BlockAppointletAdmin'
+    _title: 'Manage Apppointlet settings'
+  requirements:
+    _permission: 'access administration pages'

@@ -1,0 +1,5 @@
+block_appointlet.block_appointlet_admin:
+  title: 'Appointlet settings'
+  route_name: block_appointlet.block_appointlet_admin
+  description: 'Manage Apppointlet settings'
+  parent: system.admin_config_system

@@ -78,10 +78,10 @@
      */
     public function blockSubmit($form, FormStateInterface $form_state) {
 
-      $this->configuration['grid_template'] = $form_state->getValue('grid_template');
-      $this->configuration['grid_display']  = $form_state->getValue('grid_display');
-      $this->configuration['campus']        = $form_state->getValue('campus');
-      $this->configuration['degree']        = $form_state->getValue('degree');
+//      $this->configuration['grid_template'] = $form_state->getValue('grid_template');
+//      $this->configuration['grid_display']  = $form_state->getValue('grid_display');
+//      $this->configuration['campus']        = $form_state->getValue('campus');
+//      $this->configuration['degree']        = $form_state->getValue('degree');
 
     }
 
