@@ -1,0 +1,11 @@
+script_source: 'https://www.appointletcdn.com/loader/loader.min.js'
+default_organization: 'herzing-university'
+default_service: '34261'
+
+utm_source: ''
+utm_medium: ''
+utm_campaign: 'www.herzing.edu'
+utm_content: ''
+utm_term: ''
+
+campus_members: "AKR|22264\r\nATL|22266\r\nBHM|22267\r\nBRK|22271\r\nKEN|22269\r\nMSN|22272\r\nMPL|22273\r\nNOR|20454\r\nORL|22275\r\nTOL|22289\r\nONL|21573"

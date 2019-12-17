@@ -55,7 +55,7 @@
             '#title'          => '<p>Appointlet JavaScript source</p>',
             '#description'    => '<p>The URL for the source.  Refer to the Website tab in the Sharing area and enter the src value for the script.</p>',
             '#default_value'  => $config->get( 'script_source') ?? '',
-            '#size'           => 20,
+            '#size'           => 200,
             '#maxlength'      => 200,
             '#required'       => TRUE,
         );
@@ -65,7 +65,7 @@
             '#title'          =>'<p>Appointlet Organization</p>',
             '#description'    =>'<p>The organization code which will be included with all Appointlet links.</p>',
             '#default_value'  => $config->get( 'default_organization') ?? '',
-            '#size'           => 20,
+            '#size'           => 200,
             '#maxlength'      => 200,
             '#required'       => TRUE,
         );
@@ -75,7 +75,7 @@
             '#title'          =>'<p>Appointlet Service</p>',
             '#description'    =>'<p>The service code that will be included with all Appointlet Links.</p>',
             '#default_value'  => $config->get( 'default_service') ?? '',
-            '#size'           => 20,
+            '#size'           => 200,
             '#maxlength'      => 200,
             '#required'       => TRUE,
         );
@@ -138,14 +138,14 @@
             '#required'       => FALSE,
         );
 
-      $form['appointlet_fields'] = array(
+      $form['campus_settings'] = array(
           '#type'             => 'details',
           '#title'            =>'<p>Campus Settings</p>',
           '#description'      =>'<p>Set relationship between Campus and Appointlet Members</p>',
           '#group'            => 'vertical_tabs',
       );
 
-        $form['appointlet_fields']['campus_members'] = array(
+        $form['campus_settings']['campus_members'] = array(
           '#type'             => 'textarea',
           '#title'            => '<p>Campus Members</p>',
           '#description'      => '<p>Enter the campus code and Appointlet member code, one per line, using the format <em>campus code|appointlet</em> member code</em>.<br>Example: <em>AKR|22264</em></p>',
