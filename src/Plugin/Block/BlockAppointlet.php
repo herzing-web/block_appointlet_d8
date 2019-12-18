@@ -330,6 +330,7 @@
       // set up block
       $build['#theme']            = 'block_appointlet_button';
       $build['#button_data']      = $data;
+      $build['#attached']['library'][] = 'block_appointlet/block_appointlet.appointlet_js';
 
       // go! go go go!
       return $build;

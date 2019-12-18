@@ -1,0 +1,4 @@
+block_appointlet.appointlet_js:
+  version: VERSION
+  js:
+    https://www.appointletcdn.com/loader/loader.min.js: { type: external, minified: true }
