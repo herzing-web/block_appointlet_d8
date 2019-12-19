@@ -14,6 +14,7 @@
 
   use Drupal\Core\Entity\EntityTypeManager;
   use Drupal\node\Entity\Node;
+  use Drupal\node\NodeInterface;
 
   use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -176,7 +177,7 @@
       $form[ 'appointlet_settings' ] = array(
         '#type'             => 'details',
         '#title'            => 'Form settings',
-        '#description'      => "<p>Values that will be sent to the  Appointlet form.</p>",
+        '#description'      => "<p>Values that will be sent to the Appointlet form.</p>",
 //        '#group'            => 'vertical_tabs',
           '#open'             => true,
       );
@@ -194,44 +195,44 @@
         $form['appointlet_settings']['utm_source'] = array(
             '#type'           => 'textfield',
             '#title'          => t('Source'),
-            '#description'    => t('The string that will be sent as the utm_source data.  <strong>Should be set to leadform</strong>'),
+            '#description'    => t('The string that will be sent as the utm_source data and will indicate what type of Appointlet form was used.  <strong>Should be set to <em>leadform</em> to pass Appointlet data to Velocify or <em>thankyou</em> to update an existing Velocify record with appointment details.</strong>'),
             '#default_value'  => $this->configuration['utm_source'] ?? '',
             '#size'           => 100,
             '#maxlength'      => 100,
             '#required'       => TRUE,
         );
 
-        $form['appointlet_settings']['utm_medium'] = array(
+        $form['appointlet_settings']['utm_campaign'] = array(
             '#type'           => 'textfield',
-            '#title'          => t('Medium'),
-            '#description'    => t('The string that will be sent as the utm_medium data.  Leave blank for no value.'),
-            '#default_value'  => $this->configuration['utm_medium'] ?? '',
+            '#title'          => t('Campaign'),
+            '#description'    => t('The string that will be sent as the utm_campaign data.  <strong>This should be set to the URL of the current page. If left blank, the URL of the current page will be used.</strong>'),
+            '#default_value'  => $this->configuration['utm_campaign'] ?? '',
             '#size'           => 100,
             '#maxlength'      => 100,
             '#required'       => FALSE,
         );
 
-        $form['appointlet_settings']['utm_campaign'] = array(
-            '#type'           => 'textfield',
-            '#title'          => t('Campaign'),
-            '#description'    => t('The string that will be sent as the utm_campaign data.  <strong>This should be set to the URL of the current page.</strong>'),
-            '#default_value'  => $this->configuration['utm_campaign'] ?? '',
-            '#size'           => 100,
-            '#maxlength'      => 100,
-            '#required'       => TRUE,
-        );
-
         $form[ 'appointlet_settings' ]['cta_page'] = array(
             '#type'           => 'textfield',
             '#title'          => t('Page Title'),
-            '#description'    => t('The string that will be sent as the page data for analytics tracking.  <strong>This should be set to the page title of the current page.</strong>'),
+            '#description'    => t('The string that will be sent as the page data for analytics tracking.  <strong>This should be set to the page title of the current page. If left blank, the title of the current page will be used.</strong>'),
             '#default_value'  => $this->configuration['cta_page'] ?? '',
             '#size'           => 100,
             '#maxlength'      => 100,
             '#required'       => FALSE,
         );
 
-        $form['appointlet_settings']['utm_content'] = array(
+      $form['appointlet_settings']['utm_medium'] = array(
+          '#type'           => 'textfield',
+          '#title'          => t('Medium'),
+          '#description'    => t('The string that will be sent as the utm_medium data.  Leave blank for no value.'),
+          '#default_value'  => $this->configuration['utm_medium'] ?? '',
+          '#size'           => 100,
+          '#maxlength'      => 100,
+          '#required'       => FALSE,
+      );
+
+      $form['appointlet_settings']['utm_content'] = array(
             '#type'           => 'textfield',
             '#title'          => t('Content'),
             '#description'    => t('The string that will be sent as the utm_content data.  Leave blank for no value.'),
@@ -299,6 +300,16 @@
       $campus_options = $this->get_campus_options();
       $organization   = \Drupal::config('block_appointlet.blockappointletadmin')->get('default_organization');
 
+      $node = \Drupal::routeMatch()->getParameter('node');
+      if( !empty( $node) ) {
+        $utm_campaign = $node->toUrl('canonical', ['absolute'=>true])->toString();
+        $cta_page     = $node->label();
+      }
+      else{
+        $utm_campaign = '';
+        $cta_page     = '';
+      }
+
       // set caching levels
 //    $build['#cache'] = array(
 //        'contexts' => $this->getCacheContexts(),
@@ -318,8 +329,8 @@
       
       $data['utm_source']         = $this->configuration['utm_source'];
       $data['utm_medium']         = $this->configuration['utm_medium'];
-      $data['utm_campaign']       = $this->configuration['utm_campaign'];
-      $data['cta_page']           = $this->configuration['cta_page'];
+      $data['utm_campaign']       = $this->configuration['utm_campaign']  ?: $utm_campaign;
+      $data['cta_page']           = $this->configuration['cta_page']      ?: $cta_page;
       $data['utm_content']        = $this->configuration['utm_content'];
       $data['utm_term']           = $this->configuration['utm_term'];
 

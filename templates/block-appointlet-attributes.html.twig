@@ -7,12 +7,12 @@ data-appointlet-field-program="{{ button_data.program }}"
 data-appointlet-field-vendorcode="{{ button_data.vendor }}"
 data-appointlet-field-vendoraffiliateid="{{ button_data.vendoraffiliateid }}"
 
-data-type="{{ button_data.type }}"
+{% if button_data.type %}data-type="{{ button_data.type }}"{% endif %}
 
 data-page="{{ button_data.cta_page }}"
 
 data-appointlet-query-utm_source="{{ button_data.utm_source }}"
-data-appointlet-query-utm_medium="{{ button_data.utm_medium }}"
+{%  if button_data.utm_medium %}data-appointlet-query-utm_medium="{{ button_data.utm_medium }}"{% endif %}
 data-appointlet-query-utm_campaign="{{ button_data.utm_campaign }}"
-data-appointlet-query-utm_content="{{ button_data.utm_content }}"
-data-appointlet-query-utm_term="{{ button_data.utm_term }}"
+{%  if button_data.utm_content %}data-appointlet-query-utm_content="{{ button_data.utm_content }}"{% endif %}
+{%  if button_data.utm_term %}data-appointlet-query-utm_term="{{ button_data.utm_term }}"{% endif %}
