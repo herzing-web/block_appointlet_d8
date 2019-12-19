@@ -33,16 +33,21 @@
 
     return [
 
-//    'block_program_grid' => [
-//      'render element' => 'children',
-//    ],
-
       'block_appointlet_button' => [
         'template'  => 'block-appointlet-button',
         'variables' => [
           'button_data'  => [],
         ]
       ],
+      
+      'block_appointlet_attributes' => [
+        'template'  => 'block-appointlet-attributes',
+        'variables' => [
+          'button_data'  => [],
+        ]
+      ],
+      
+      
     ];
 
   }
