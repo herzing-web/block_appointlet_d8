@@ -29,6 +29,8 @@
   class BlockAppointlet extends BlockBase implements ContainerFactoryPluginInterface {
 
     protected $node_storage;
+    
+    protected $webform_storage;
 
     /**
      * Constructs a new BlockAppointlet object.
@@ -45,7 +47,8 @@
     public function __construct( array $configuration, $plugin_id, $plugin_definition, $entityTypeManager ) {
       parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-      $this->node_storage  = $entityTypeManager->getStorage('node');
+      $this->node_storage     = $entityTypeManager->getStorage('node');
+      $this->webform_storage  = $entityTypeManager->getStorage('webform_submission');
 
     }
 
@@ -182,25 +185,53 @@
           '#open'             => true,
       );
 
-        $form[ 'appointlet_settings' ][ 'service' ] = array(
-          '#type'           => 'textfield',
-          '#title'          => t( 'Service code' ),
-          '#description'    => t( 'Enter the Appointlet service ID.  This can be found by going into Appointlet and editing the desired service and copying the integer at the end of the URL.<br><em>Example: Given the URL https://admin.appointlet.com/organizations/17714/services/60134, the Service ID is 60134.</em>' ),
-          '#default_value'  => $this->configuration['service'] ?? '',
-          '#size'           => 20,
-          '#maxlength'      => 20,
-          '#required'       => TRUE,
-        );
-
-        $form['appointlet_settings']['utm_source'] = array(
-            '#type'           => 'textfield',
-            '#title'          => t('Source'),
-            '#description'    => t('The string that will be sent as the utm_source data and will indicate what type of Appointlet form was used.  <strong>Should be set to <em>leadform</em> to pass Appointlet data to Velocify or <em>thankyou</em> to update an existing Velocify record with appointment details.</strong>'),
-            '#default_value'  => $this->configuration['utm_source'] ?? '',
-            '#size'           => 100,
-            '#maxlength'      => 100,
+      $form[ 'appointlet_settings' ][ 'service' ] = array(
+            '#type'           => 'select',
+            '#title'          => t( 'Appointment Type' ),
+            '#description'    => t( 'Select the appointment type.' ),
+            '#options'        => [
+                '60134'   => 'Speak with an Adviser',
+                '152238'  => 'Schedule a Nursing Tour'
+            ],
+            '#default_value'  => $this->configuration['service'] ?? '60134',
+            '#empty_option'   => '--- Select ---',
+            '#empty_value'    => '',
             '#required'       => TRUE,
         );
+
+//        $form[ 'appointlet_settings' ][ 'service' ] = array(
+//          '#type'           => 'textfield',
+//          '#title'          => t( 'Service code' ),
+//          '#description'    => t( 'Enter the Appointlet service ID.  This can be found by going into Appointlet and editing the desired service and copying the integer at the end of the URL.<br><em>Example: Given the URL https://admin.appointlet.com/organizations/17714/services/60134, the Service ID is 60134.</em>' ),
+//          '#default_value'  => $this->configuration['service'] ?? '',
+//          '#size'           => 20,
+//          '#maxlength'      => 20,
+//          '#required'       => TRUE,
+//        );
+
+      $form['appointlet_settings']['utm_source'] = array(
+            '#type'           => 'select',
+            '#title'          => 'Source',
+            '#description'    => t( 'Select the appointment type.' ),
+            '#options'        => [
+                'leadform'  => 'Lead form - Create a new lead',
+                'thankyou'  => 'Thank you - Update lead with appointment'
+            ],
+            '#default_value'  => $this->configuration['utm_source'] ?? 'leadform',
+            '#empty_option'   => '--- Select ---',
+            '#empty_value'    => '',
+            '#required'       => TRUE,
+        );
+
+//      $form['appointlet_settings']['utm_source'] = array(
+//            '#type'           => 'textfield',
+//            '#title'          => t('Source'),
+//            '#description'    => t('The string that will be sent as the utm_source data and will indicate what type of Appointlet form was used.  <strong>Should be set to <em>leadform</em> to pass Appointlet data to Velocify or <em>thankyou</em> to update an existing Velocify record with appointment details.</strong>'),
+//            '#default_value'  => $this->configuration['utm_source'] ?? '',
+//            '#size'           => 100,
+//            '#maxlength'      => 100,
+//            '#required'       => TRUE,
+//        );
 
         $form['appointlet_settings']['utm_campaign'] = array(
             '#type'           => 'textfield',
@@ -268,11 +299,6 @@
      */
     public function blockSubmit($form, FormStateInterface $form_state) {
 
-//      $this->configuration['grid_template'] = $form_state->getValue('grid_template');
-//      $this->configuration['grid_display']  = $form_state->getValue('grid_display');
-//      $this->configuration['campus']        = $form_state->getValue('campus');
-//      $this->configuration['degree']        = $form_state->getValue('degree');
-
       $this->configuration['button_text']       = $form_state->getValue(['button_settings',     'button_text'], 'Schedule an Appointment');
       $this->configuration['button_class']      = $form_state->getValue(['button_settings',     'button_class'], '');
       $this->configuration['campus']            = $form_state->getValue(['form_settings',       'campus'], 'ONL');
@@ -310,19 +336,47 @@
         $cta_page     = '';
       }
 
-      // set caching levels
-//    $build['#cache'] = array(
-//        'contexts' => $this->getCacheContexts(),
-//        'max-age' => $this->getCacheMaxAge(),
-//    );
+      // get poosible form id
+      $cookie       = \Drupal::request()->cookies->get('Drupal_visitor_submission_data');
+      user_cookie_delete('submission.data' );
 
+      if( !empty( $cookie ) ) {
+        // get submission data
+        $form_results = $this->webform_storage->loadByProperties([
+            'uuid' => $cookie,
+        ]);
+
+        $webform  = array_shift($form_results) ;
+
+        $fields   = $webform->getData();
+
+        $data['email']      = $fields['email'];
+        $data['phone']      = $fields['homephone'];
+        $data['first_name'] = $fields['firstname'];
+        $data['last_name']  = $fields['lastname'];
+        $data['zip']        = $fields['postalcode'];
+        $campuscode         = $fields['campus_area_program']['campuscode'];
+        $programcode        = $fields['campus_area_program']['program'];
+
+      }
+      else {
+        // no submission, set default values
+        $data['email']      = '';
+        $data['phone']      = '';
+        $data['first_name'] = '';
+        $data['last_name']  = '';
+        $data['zip']        = '';
+        $campuscode         = '';
+        $programcode        = '';
+
+      }
 
       // set up data
       $data['button_text']        = $this->configuration['button_text'];
       $data['button_class']       = $this->configuration['button_class'];
 
-      $data['campus']             = $campus_options[$this->configuration['campus']];
-      $data['program']            = $this->configuration['program'];
+      $data['campus']             = $campuscode   ?: $campus_options[$this->configuration['campus']];
+      $data['program']            = $programcode  ?: $this->configuration['program'];
       $data['vendor']             = $this->configuration['vendor'];
       $data['vendoraffiliateid']  = $this->configuration['vendoraffiliateid'];
       $data['service']            = $this->configuration['service'];
@@ -339,6 +393,13 @@
       $data['bookable']           = $this->configuration['campus'];
 
       // set up block
+
+      // set caching levels
+      $build['#cache'] = array(
+          'contexts' => $this->getCacheContexts(),
+          'max-age' => $this->getCacheMaxAge(),
+      );
+
       $build['#theme']            = 'block_appointlet_button';
       $build['#button_data']      = $data;
       $build['#attached']['library'][] = 'block_appointlet/block_appointlet.appointlet_js';
