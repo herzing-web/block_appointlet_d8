@@ -12,6 +12,8 @@
   use Drupal\Core\Form\FormStateInterface;
   use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
+  use Drupal\webform_formsapi\WebformFormsAPI;
+
   use Drupal\Core\Entity\EntityTypeManager;
   use Drupal\node\Entity\Node;
   use Drupal\node\NodeInterface;
@@ -29,8 +31,10 @@
   class BlockAppointlet extends BlockBase implements ContainerFactoryPluginInterface {
 
     protected $node_storage;
-    
+
     protected $webform_storage;
+
+    protected $forms_api;
 
     /**
      * Constructs a new BlockAppointlet object.
@@ -42,13 +46,15 @@
      * @param string $plugin_definition
      *   The plugin implementation definition.
      * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
-     *
+     * @param \Drupal\webform_formsapi\WebformFormsAPI $forms_api
      */
-    public function __construct( array $configuration, $plugin_id, $plugin_definition, $entityTypeManager ) {
+    public function __construct( array $configuration, $plugin_id, $plugin_definition, $entityTypeManager, $forms_api ) {
       parent::__construct($configuration, $plugin_id, $plugin_definition);
 
       $this->node_storage     = $entityTypeManager->getStorage('node');
       $this->webform_storage  = $entityTypeManager->getStorage('webform_submission');
+
+      $this->forms_api        = $forms_api;
 
     }
 
@@ -61,7 +67,8 @@
         $configuration,
         $plugin_id,
         $plugin_definition,
-        $container->get('entity_type.manager')
+        $container->get('entity_type.manager'),
+        $container->get('webform_formsapi')
       );
 
     }
@@ -336,51 +343,19 @@
         $cta_page     = '';
       }
 
-      // get poosible form id
-      $cookie       = \Drupal::request()->cookies->get('Drupal_visitor_submission_data');
-      user_cookie_delete('submission.data' );
-
-      if( !empty( $cookie ) ) {
-        // get submission data
-        $form_results = $this->webform_storage->loadByProperties([
-            'uuid' => $cookie,
-        ]);
-
-        $webform  = array_shift($form_results) ;
-
-        $fields   = $webform->getData();
-
-        $data['email']      = $fields['email'];
-        $data['phone']      = $fields['homephone'];
-        $data['first_name'] = $fields['firstname'];
-        $data['last_name']  = $fields['lastname'];
-        $data['zip']        = $fields['postalcode'];
-        $campuscode         = $fields['campus_area_program']['campuscode'];
-        $programcode        = $fields['campus_area_program']['program'];
-
-      }
-      else {
-        // no submission, set default values
-        $data['email']      = '';
-        $data['phone']      = '';
-        $data['first_name'] = '';
-        $data['last_name']  = '';
-        $data['zip']        = '';
-        $campuscode         = '';
-        $programcode        = '';
-
-      }
+      // get any saved form values
+      $data = $this->forms_api->get_saved_form_values();
 
       // set up data
       $data['button_text']        = $this->configuration['button_text'];
       $data['button_class']       = $this->configuration['button_class'];
 
-      $data['campus']             = $campuscode   ?: $campus_options[$this->configuration['campus']];
-      $data['program']            = $programcode  ?: $this->configuration['program'];
+      $data['campus']             = $data['campus']   ?: $campus_options[$this->configuration['campus']];
+      $data['program']            = $data['program']  ?: $this->configuration['program'];
       $data['vendor']             = $this->configuration['vendor'];
       $data['vendoraffiliateid']  = $this->configuration['vendoraffiliateid'];
       $data['service']            = $this->configuration['service'];
-      
+
       $data['utm_source']         = $this->configuration['utm_source'];
       $data['utm_medium']         = $this->configuration['utm_medium'];
       $data['utm_campaign']       = $this->configuration['utm_campaign']  ?: $utm_campaign;
