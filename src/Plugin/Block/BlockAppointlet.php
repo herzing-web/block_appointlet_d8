@@ -91,6 +91,7 @@
         'cta_page'          => '',
         'utm_content'       => '',
         'utm_term'          => '',
+        'button_template'   => 'block-appointlet-button',
       ] + parent::defaultConfiguration();
     }
 
@@ -99,6 +100,7 @@
      */
     public function blockForm($form, FormStateInterface $form_state) {
 
+      $template_options = $this->get_template_options();
       $campus_codes   = $this->get_campus_options();
       $program_codes  = $this->get_program_options();
 
@@ -114,7 +116,20 @@
         '#open'             => true,
       );
 
-        $form[ 'button_settings' ][ 'button_text' ] = array(
+        $form[ 'button_settings' ][ 'button_template' ] = array(
+          '#type'           => 'select',
+          '#title'          => t( 'Button display' ),
+  //      '#description'    => t( 'Long description of the field use' ),
+          '#options'        => $template_options,
+          '#default_value'  => $this->configuration['button_template'],
+          '#empty_option'   => '--- Select ---',
+          '#empty_value'    => '',
+          '#required'       => TRUE,
+          '#weight'         => '1',
+        );
+
+
+      $form[ 'button_settings' ][ 'button_text' ] = array(
           '#type'           => 'textfield',
           '#title'          => t( 'Button Text' ),
           '#description'    => t( 'Text that will be displayed on the CTA button.' ),
@@ -306,6 +321,7 @@
      */
     public function blockSubmit($form, FormStateInterface $form_state) {
 
+      $this->configuration['button_template']   = $form_state->getValue(['button_settings',     'button_template'], 'block-appointlet-button');
       $this->configuration['button_text']       = $form_state->getValue(['button_settings',     'button_text'], 'Schedule an Appointment');
       $this->configuration['button_class']      = $form_state->getValue(['button_settings',     'button_class'], '');
       $this->configuration['campus']            = $form_state->getValue(['form_settings',       'campus'], 'ONL');
@@ -332,6 +348,7 @@
 
       $campus_options = $this->get_campus_options();
       $organization   = \Drupal::config('block_appointlet.blockappointletadmin')->get('default_organization');
+      $template       = $this->configuration['button_template'];
 
       $node = \Drupal::routeMatch()->getParameter('node');
       if( !empty( $node) ) {
@@ -375,7 +392,7 @@
           'max-age' => $this->getCacheMaxAge(),
       );
 
-      $build['#theme']            = 'block_appointlet_button';
+      $build['#theme']            = $template;
       $build['#button_data']      = $data;
       $build['#attached']['library'][] = 'block_appointlet/block_appointlet.appointlet_js';
 
@@ -411,6 +428,29 @@
      */
     public function getCacheMaxAge() {
       return 24 * 60 * 60;  // set to 24 hours
+    }
+
+    /**
+     * Create template options
+     *
+     * @return array
+     */
+    private function get_template_options() {
+
+      $output = [];
+
+      $templates =  block_appointlet_theme();
+
+      foreach( $templates as $key => $template ) {
+
+        if( !empty( $template['option_label'] ) ) {
+          $output[$key] = $template['option_label'];
+        }
+
+      }
+
+      return $output;
+
     }
 
     /**

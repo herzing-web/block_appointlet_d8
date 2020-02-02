@@ -34,20 +34,29 @@
     return [
 
       'block_appointlet_button' => [
+        'option_label'  => 'Button only',
         'template'  => 'block-appointlet-button',
         'variables' => [
           'button_data'  => [],
         ]
       ],
-      
+
       'block_appointlet_attributes' => [
         'template'  => 'block-appointlet-attributes',
         'variables' => [
           'button_data'  => [],
         ]
       ],
-      
-      
+
+      'block_appointlet_button_example' => [
+        'option_label'  => 'Button with text example',
+        'template'  => 'block-appointlet-button-example',
+        'variables' => [
+          'button_data'  => [],
+        ]
+      ],
+
+
     ];
 
   }
