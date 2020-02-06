@@ -528,6 +528,8 @@
 
       asort( $output );
 
+      $output += ['UNDECIDE' => 'Undecided'];
+
       return $output;
 
     }
