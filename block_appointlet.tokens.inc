@@ -89,24 +89,25 @@ function block_appointlet_tokens( $type, $tokens, array $data, array $options, B
     if( empty( $token_data['vendoraffiliateid'] ) ) { \Drupal::messenger()->addError( "Required value for 'vendoraffiliateid' is missing" ); }
     if( empty( $token_data['service'] ) )           { \Drupal::messenger()->addError( "Required value for 'service' is missing" ); }
     if( empty( $token_data['utm_source'] ) )        { \Drupal::messenger()->addError( "Required value for 'utm_source' is missing" ); }
-    if( empty( $token_data['utm_medium'] ) )        { \Drupal::messenger()->addError( "Required value for 'utm_medium' is missing" ); }
+//    if( empty( $token_data['utm_medium'] ) )        { \Drupal::messenger()->addError( "Required value for 'utm_medium' is missing" ); }
 //    if( empty( $token_data['utm_campaign'] ) )      { \Drupal::messenger()->addError( "Required value for 'utm_campaign' is missing" ); }
 //    if( empty( $token_data['cta_page'] ) )          { \Drupal::messenger()->addError( "Required value for 'cta_page' is missing" ); }
 
 //    $data = array_merge( $token_data, $saved_data );
+    $button_data                 = $token_data;
 
-    $data['type']         = trim( strip_tags($token_data['button_text']));
-    $data['organization'] = $organization;
-    $data['bookable']     = $campus_members[$token_data['campus'] ?? 'ONL'];
-    $data['campus']       = isset($token_data['campus'])  ? $token_data['campus']  : ( $campus_members[$data['campus'] ?? $config->get('campus')] );
-    $data['program']      = isset($token_data['program']) ? $token_data['program'] : $config->get('program');
+    $button_data['type']         = trim( strip_tags($button_data['button_text']));
+    $button_data['organization'] = $organization;
+    $button_data['bookable']     = $campus_members[$button_data['campus'] ?? 'ONL'];
+    $button_data['campus']       = $button_data['campus']       ?: $config->get('campus')];
+    $button_data['program']      = $button_data['program']      ?: $config->get('program');
 
-    $data['utm_campaign'] = isset($token_data['utm_campaign']) ? $token_data['utm_campaign']  : $utm_campaign;
-    $data['cta_page']     = isset($token_data['cta_page'])     ? $token_data['cta_page']      : $cta_page;
+    $button_data['utm_campaign'] = $button_data['utm_campaign'] ?: $utm_campaign;
+    $button_data['cta_page']     = $button_data['cta_page']     ?: $cta_page;
 
     // set up build array
     $build = [];
-    $build['#button_data']            = $data;
+    $build['#button_data']            = $button_data;
     $build['#attached']['library'][]  = 'block_appointlet/block_appointlet.appointlet_js';
 
     // render token
