@@ -60,7 +60,9 @@ function block_appointlet_tokens( $type, $tokens, array $data, array $options, B
   $campus_data    = $config->get('campus_members');
   $campus_members = \Drupal::service('herzing_functions')->string_to_array($campus_data);
   $organization   = $config->get('default_organization');
-  $saved_data     = \Drupal::service('webform_formsapi')->get_saved_form_values();
+
+  // get values from a submitted form
+//  $saved_data     = \Drupal::service('webform_formsapi')->get_saved_form_values();
 
   $node = \Drupal::routeMatch()->getParameter('node');
   if( !empty( $node) ) {
@@ -91,16 +93,16 @@ function block_appointlet_tokens( $type, $tokens, array $data, array $options, B
 //    if( empty( $token_data['utm_campaign'] ) )      { \Drupal::messenger()->addError( "Required value for 'utm_campaign' is missing" ); }
 //    if( empty( $token_data['cta_page'] ) )          { \Drupal::messenger()->addError( "Required value for 'cta_page' is missing" ); }
 
-    $data = array_merge( $token_data, $saved_data );
+//    $data = array_merge( $token_data, $saved_data );
 
-    $data['type']         = trim( strip_tags($data['button_text']));
+    $data['type']         = trim( strip_tags($token_data['button_text']));
     $data['organization'] = $organization;
-    $data['bookable']     = $campus_members[$data['campus'] ?? 'ONL'];
-    $data['campus']       = $data['campus']       ?: $campus_members[$data['campus'] ?? $config->get('campus')];
-    $data['program']      = $data['program']      ?: $config->get('program');
+    $data['bookable']     = $campus_members[$token_data['campus'] ?? 'ONL'];
+    $data['campus']       = isset($token_data['campus'])  ? $token_data['campus']  : ( $campus_members[$data['campus'] ?? $config->get('campus')] );
+    $data['program']      = isset($token_data['program']) ? $token_data['program'] : $config->get('program');
 
-    $data['utm_campaign'] = $data['utm_campaign'] ?: $utm_campaign;
-    $data['cta_page']     = $data['cta_page']     ?: $cta_page;
+    $data['utm_campaign'] = isset($token_data['utm_campaign']) ? $token_data['utm_campaign']  : $utm_campaign;
+    $data['cta_page']     = isset($token_data['cta_page'])     ? $token_data['cta_page']      : $cta_page;
 
     // set up build array
     $build = [];

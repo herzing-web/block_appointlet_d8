@@ -361,14 +361,14 @@
       }
 
       // get any saved form values
-      $data = $this->forms_api->get_saved_form_values();
+//      $data = $this->forms_api->get_saved_form_values();
 
       // set up data
       $data['button_text']        = $this->configuration['button_text'];
       $data['button_class']       = $this->configuration['button_class'];
 
-      $data['campus']             = $data['campus']   ?: $campus_options[$this->configuration['campus']];
-      $data['program']            = $data['program']  ?: $this->configuration['program'];
+      $data['campus']             = isset($data['campus'])  ? $data['campus']   : $campus_options[$this->configuration['campus']];
+      $data['program']            = isset($data['program']) ? $data['program']  : $this->configuration['program'];
       $data['vendor']             = $this->configuration['vendor'];
       $data['vendoraffiliateid']  = $this->configuration['vendoraffiliateid'];
       $data['service']            = $this->configuration['service'];
