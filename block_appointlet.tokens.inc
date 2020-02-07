@@ -99,7 +99,7 @@ function block_appointlet_tokens( $type, $tokens, array $data, array $options, B
     $button_data['type']         = trim( strip_tags($button_data['button_text']));
     $button_data['organization'] = $organization;
     $button_data['bookable']     = $campus_members[$button_data['campus'] ?? 'ONL'];
-    $button_data['campus']       = $button_data['campus']       ?: $config->get('campus')];
+    $button_data['campus']       = $button_data['campus']       ?: $config->get('campus');
     $button_data['program']      = $button_data['program']      ?: $config->get('program');
 
     $button_data['utm_campaign'] = $button_data['utm_campaign'] ?: $utm_campaign;
@@ -109,6 +109,7 @@ function block_appointlet_tokens( $type, $tokens, array $data, array $options, B
     $build = [];
     $build['#button_data']            = $button_data;
     $build['#attached']['library'][]  = 'block_appointlet/block_appointlet.appointlet_js';
+    $build['#attached']['drupalSettings']['block_appointlet']['campus_bookable'] = $campus_members;
 
     // render token
     switch( $display ) {

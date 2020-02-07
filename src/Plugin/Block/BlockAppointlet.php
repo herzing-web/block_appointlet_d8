@@ -395,6 +395,8 @@
       $build['#theme']            = $template;
       $build['#button_data']      = $data;
       $build['#attached']['library'][] = 'block_appointlet/block_appointlet.appointlet_js';
+      $build['#attached']['drupalSettings']['block_appointlet']['campus_bookable'] = $campus_options;
+
 
       // go! go go go!
       return $build;
