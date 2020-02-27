@@ -173,9 +173,11 @@ function block_appointlet_parse_settings( $settings ) {
     'utm_term'          => '',
   ];
 
-
   // parse through settings
   foreach( explode( '|', $settings ) as $item ) {
+
+    // skip empty items
+    if( empty( $item ) ) { continue; }
 
     list( $key, $value ) = explode( '=', $item );
 
