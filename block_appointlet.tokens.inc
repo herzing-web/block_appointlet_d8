@@ -147,7 +147,7 @@ function block_appointlet_parse_settings( $settings ) {
 
   // get default url and page name
   $node = \Drupal::routeMatch()->getParameter('node');
-  if( !empty( $node ) ) {
+  if( !empty( $node ) && !is_string($node) ) {
     $utm_campaign = $node->toUrl('canonical', ['absolute'=>true])->toString();
     $cta_page     = $node->label();
   }
